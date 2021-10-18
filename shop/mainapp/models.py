@@ -41,6 +41,30 @@ class Product(models.Model):
         return self.title
 
 
+class FishRod(Product):
+
+    type = models.CharField(max_length=255, verbose_name='Тип удилища')
+    length = models.CharField(max_length=255, verbose_name='Длина удилища')
+    weight = models.CharField(max_length=255, verbose_name='Вес удилища')
+    transport_length = models.CharField(max_length=255, verbose_name='Транспортировочная длина')
+    number_of_sections = models.CharField(max_length=255, verbose_name='Количество секций')
+    maximum_test = models.CharField(max_length=255, verbose_name='Максимальный тест')
+
+    def __str__(self):
+        return "{} : {}".format(self.category.name, self.title)
+
+
+class FishLine(Product):
+    type = models.CharField(max_length=255, verbose_name='Тип лески')
+    diameter = models.CharField(max_length=255, verbose_name='Диаметр лески')
+    breaking_load = models.CharField(max_length=255, verbose_name='Разрывная нагрузка')
+    length = models.CharField(max_length=255, verbose_name='Длина лески')
+    color = models.CharField(max_length=255, verbose_name='Цвет лески')
+
+    def __str__(self):
+        return "{} : {}".format(self.category.name, self.title)
+
+
 class CartProduct(models.Model):
 
     user = models.ForeignKey('Customer', verbose_name='Покупатель', on_delete=models.CASCADE)
