@@ -28,6 +28,7 @@ class LatestProducts:
 
     object = LatestProductManager
 
+
 class Category(models.Model):
 
     name = models.CharField(max_length=255, verbose_name='Имя категории')
