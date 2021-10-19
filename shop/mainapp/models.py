@@ -4,8 +4,14 @@ from django.db import models
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
+from django.urls import reverse
 
 User = get_user_model()
+
+
+def get_product_url(obj, viewname):
+    ct_model = obj.__class__._meta.model_name
+    return reverse(viewname, kwargs={'ct_model': ct_model, 'slug': obj.slug})
 
 
 class MinResolutionErrorException(Exception):
@@ -76,7 +82,7 @@ class Product(models.Model):
             raise MinResolutionErrorException('Разрешение изображения меньше минимального!')
         if img.height > max_height or img.width > max_width:
             raise MaxResolutionErrorException('Разрешение изображения больше максимального!')
-        return image
+        super().save(*args, **kwargs)
 
 
 class FishRod(Product):
@@ -91,6 +97,9 @@ class FishRod(Product):
     def __str__(self):
         return "{} : {}".format(self.category.name, self.title)
 
+    def get_absolute_url(self):
+        return get_product_url(self, 'product_detail')
+
 
 class FishLine(Product):
     type = models.CharField(max_length=255, verbose_name='Тип лески')
@@ -101,6 +110,9 @@ class FishLine(Product):
 
     def __str__(self):
         return "{} : {}".format(self.category.name, self.title)
+
+    def get_absolute_url(self):
+        return get_product_url(self, 'product_detail')
 
 
 class CartProduct(models.Model):
