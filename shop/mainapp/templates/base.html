@@ -33,9 +33,10 @@
             </div>
         </nav>
         <!-- Page Content-->
-        {% block content %}
+
         <div class="container">
             <div class="row">
+
                 <div class="col-lg-3">
                     <h1 class="my-4">Shop Name</h1>
                     <div class="list-group">
@@ -45,7 +46,7 @@
                     </div>
                 </div>
                 <div class="col-lg-9">
-
+                    {% block content %}
                     <div class="carousel slide my-4" id="carouselExampleIndicators" data-ride="carousel">
                         <ol class="carousel-indicators">
                             <li class="active" data-target="#carouselExampleIndicators" data-slide-to="0"></li>
@@ -133,11 +134,12 @@
                                 <div class="card-footer"><small class="text-muted">★ ★ ★ ★ ☆</small></div>
                             </div>
                         </div>
+                    {% endblock content %}
                     </div>
 
                 </div>
             </div>
-        {% endblock content %}
+
         </div>
         <!-- Footer-->
         <footer class="py-5 bg-dark">
