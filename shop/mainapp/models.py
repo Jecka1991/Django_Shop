@@ -46,7 +46,7 @@ class LatestProductManager:
 
 class LatestProducts:
 
-    object = LatestProductManager
+    objects = LatestProductManager
 
 
 class CategoryManager(models.Manager):
