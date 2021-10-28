@@ -1,12 +1,11 @@
 from django.db import transaction
 from django.shortcuts import render
-from django.contrib.contenttypes.models import ContentType
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
 from django.http import HttpResponseRedirect
 from django.views.generic import DetailView, View
 
-from .models import Category, Customer, Cart, CartProduct, Product
+from .models import Category, Customer, Order, CartProduct, Product
 from .mixins import CartMixin
 from .forms import OrderForm, LoginForm, RegistrationForm
 from .utils import recalc_cart
@@ -199,3 +198,15 @@ class RegistrationView(CartMixin, View):
         context = {'form': form, 'cart': self.cart}
         return render(request, 'registration.html', context)
 
+
+class ProfileView(CartMixin, View):
+
+    def get(self, request, *args, **kwargs):
+        customer = Customer.objects.get(user=request.user)
+        orders = Order.objects.filter(customer=customer).order_by('-created_at')
+        categories = Category.objects.all()
+        return render(
+            request,
+            'profile.html',
+            {'orders': orders, 'cart': self.cart, 'category': categories}
+        )
