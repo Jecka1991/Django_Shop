@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+    <title>Title</title>
+</head>
+<style>
+    #id_characteristic {
+        width: 200px;
+        margin-right: 15px;
+    }
+    #id_characteristic_key_name {
+        width: 400px;
+        margin-right: 15px;
+    }
+</style>
+<body>
+<div class="container">
+<h3 class="text-center">Админка характеристик</h3>
+<hr>
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+{% endif %}
+<div class="row">
+    <div class="col-md-4">
+<div class="list-group">
+    <a href="{% url 'new-category' %}" class="list-group-item list-group-item-action {% if request.path == "/product-specifications/new-category/" %}active{% endif %}" aria-current="true">
+    Создать новую категорию
+  </a>
+  <a href="{% url 'new-characteristic' %}" class="list-group-item list-group-item-action {% if request.path == "/product-specifications/new-characteristic/" %}active{% endif %}" aria-current="true">
+    Создать новую характеристику
+  </a>
+    <a href="{% url 'new-validator' %}" class="list-group-item list-group-item-action {% if request.path == "/product-specifications/new-validator/" %}active{% endif %}" aria-current="true">
+    Создать значение характеристики
+  </a>
+    <a href="{% url 'new-product-characteristic' %}" class="list-group-item list-group-item-action {% if request.path == "/product-specifications/new-product-characteristic/" %}active{% endif %}" aria-current="true">
+    Создать характеристику для товара
+    <a href="{% url 'update-product-characteristic' %}" class="list-group-item list-group-item-action {% if request.path == "/product-specifications/update-product-characteristics/" %}active{% endif %}" aria-current="true">
+    Редактировать характеристику для товара
+  </a>
+</div>
+    </div>
+    <div class="col-md-8">
+    {% block content %}
+    {% endblock %}
+
+    </div>
+</div>
+{% block productcharacteristicsupdate %}
+{% endblock productcharacteristicsupdate %}
+{% block masscharacteristics %}
+{% endblock %}
+</div>
+<script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
+{% block js %}
+<script>
+        $('select[name="category-validators"]').on('change', function() {
+        var categoryId = this.value;
+        data = {
+            category_id: categoryId
+        }
+        prev_choice = categoryId
+        $(".characteristic-validator-div").empty()
+        $(".characteristic-value-div").empty()
+        $(".errors").empty()
+        $.ajax({
+            method: "GET",
+            dataType: "json",
+            data: data,
+            url: "/product-specifications/characteristic-choice/",
+            success: function(data){
+                $(".characteristic-validator-div").css('display', 'block');
+                $(".characteristic-validator-div").append(data['result'])
+            }
+        })
+    });
+    $(document).on('change', 'select[name="characteristic-validators"]', function(){
+        $('.characteristic-value-div').empty()
+        $('.errors').empty()
+        $('.characteristic-value-div').append(
+            '<input type="text" class="form-control" id="characteristic-value" required></input>',
+            '<br>',
+            '<input type="submit" class="btn btn-success" id="create-validator" value="Создать">'
+        )
+    })
+</script>
+<script>
+    $(document).on('click', '#create-validator', function (){
+        var catgoryId = $("#category-validators-id").val();
+        var characteristicName = $("#characteristic-validators-id").val();
+        var characteristicValue = $("#characteristic-value").val()
+        data = {
+            category_id: catgoryId,
+            characteristic_name: characteristicName,
+            characteristic_value: characteristicValue
+        }
+        $.ajax({
+            method: "GET",
+            dataType: "json",
+            data:data,
+            url: "/product-specifications/characteristic-create/",
+            success: function (data){
+                if('error' in data){
+                    $('.errors').append(
+                        '<p class="text-center" style="color:red;"><strong>' + data['error'] + '</strong></p>'
+                    )
+                }else{
+                    console.log('asdasdasdasdasd')
+                    window.location.href="/product-specifications/"
+                }
+            }
+        })
+    })
+</script>
+{% endblock js %}
+</body>
+</html>

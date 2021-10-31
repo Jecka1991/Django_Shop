@@ -1,0 +1,159 @@
+{% extends 'product_characteristics.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+<div class="category-validator-div">
+    <label for="category-validators-id">Категория</label>
+    <select class="form-select" name="category-validators" id="category-validators-id" aria-label="Default select example">
+    <option selected>---</option>
+        {% for category in categories %}
+          <option value="{{ category.id }}">{{ category.name }}</option>
+        {% endfor %}
+    </select>
+</div>
+    <div class="product-search-ajax" style="display: none; margin-top: 20px;">
+      <div class="form-group">
+        <label for="search-text">Поиск товара</label>
+        <input type="text" name='search-text' class="form-control" id="search-text" aria-describedby="emailHelp" placeholder="Введите слова для поиска">
+      </div>
+    </div>
+    <div class="search-results">
+        <ul class="list-group" id="no-results" style="display: none">
+            <li class="list-group-item list-group-item-light">По вашему запросу результатов не найдено</li>
+        </ul>
+        <ul class="list-group" id="search-product-results" style="padding-top: 10px;">
+        </ul>
+    </div>
+<div class="product" style="margin-top: 30px;">
+</div>
+<div class="product-characteristic-choices">
+
+</div>
+<div class="product-characteristic-choices-values" style="margin-top: 10px;">
+
+</div>
+<input type="submit" class="btn btn-success" value="Создать" style="display: none; margin-top: 10px;" id="create-product-characteristic">
+{% endblock %}
+{% block js %}
+<script>
+    $(document).on('click', "#create-product-characteristic", function (){
+        let product = $("#product-title").text()
+        let category_characteristic = $("#product-category-characteristics-id option:selected").text()
+        let value = $("#product-category-characteristics-choices-id option:selected").text()
+        let data = {
+            product: product,
+            category_characteristic: category_characteristic,
+            value: value
+        }
+        $.ajax({
+            method: "GET",
+            dataType: "json",
+            data: data,
+            url: '/product-specifications/attach-new-product-characteristic/',
+            success: function (data){
+                console.log('asdasd')
+            }
+        })
+    })
+    function removeProduct(){
+        $(".search-results").css('display', 'block')
+        $(".product-search-ajax").css('display', 'block')
+        $(".product-characteristic-choices").empty()
+        $(".product-characteristic-choices-values").empty()
+    }
+    function getProduct(productId, title){
+        $('.product').append(
+            '<div class="alert alert-info alert-dismissible show" id="product-title" role="alert">' + title +
+            '<button type="button" onclick="removeProduct()" ' +
+            'class="btn-close" data-bs-dismiss="alert" aria-label="Close">' +
+            '</button>' +
+            '</div>'
+        )
+        $(".search-results").css('display', 'none')
+        $("#search-product-results").empty()
+        $(".product-search-ajax").css('display', 'none')
+        $(".product-characteristic-choices").css('display', 'block')
+        $(".product-characteristic-choices-values").css('display', 'block')
+        $('input[name="search-text"]').val("")
+        let data = {
+            product_id: productId
+        }
+        $.ajax({
+            method: "GET",
+            data:data,
+            dataType: "json",
+            url: "/product-specifications/attach-characteristic/",
+            success: function (data){
+                $(".product-characteristic-choices").append(data.characteristic)
+            }
+        })
+    }
+    $(document).on('change', 'select[name="product-category-characteristics"]', function (){
+        let data = {
+            category_id: this.value,
+            product_characteristic_name: $("#product-category-characteristics-id option:selected").text()
+        }
+        $.ajax({
+            method: "GET",
+            dataType: "json",
+            data: data,
+            url: "/product-specifications/product-characteristic/",
+            success: function (data){
+                $(".product-characteristic-choices-values").append(data.characteristics)
+            }
+        })
+    })
+    $(document).on('change', 'select[name="product-category-characteristics-choices"]', function (){
+        $("#create-product-characteristic").css('display', 'block')
+    })
+    $('select[name="category-validators"]').on('change', function() {
+    $(".product").empty()
+    $(".errors").empty()
+    $("#search-product-results").empty()
+    $(".product-search-ajax").css('display', 'block')
+    });
+    $('input[name="search-text"]').on('input', function(){
+    if(this.value.length == 0){
+        $(".search-results").css('display', 'none')
+    }else{
+        $(".search-results").css('display', 'block')
+    }
+    $("#search-product-results").empty()
+    let data = {
+        query: this.value,
+        category_id: $('select[name="category-validators"] option').filter(':selected').val()
+    }
+
+    $.ajax({
+    method: "GET",
+    dataType: "json",
+    data: data,
+    url: "/product-specifications/search-product/",
+    success: function(data){
+        let items = []
+        if(data.result.length < 1){
+            $('#no-results').css('display', 'block')
+        }else{
+            $('#no-results').css('display', 'none')
+        }
+        $.each(data, function (index, value) {
+            $.each(value, function (idx, v){
+                if($.inArray(v, items) == -1){
+                    items.push(v)
+                    $('#search-product-results').append(
+                        '<li class="list-group-item list-group-item-action" ' +
+                        'onclick="getProduct(\'' + v.id + '\', \'' + v.title + '\')" ' +
+                        'style="cursor: pointer" id="product-' +
+                        v.id + '">'
+                        + v.title +
+                        ' | ' +
+                        v.price +
+                        ' руб.' +
+                        '</li>')
+                        }
+                    })
+                })
+            }
+        })
+    })
+</script>
+{% endblock js %}
