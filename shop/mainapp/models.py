@@ -27,7 +27,7 @@ class Product(models.Model):
     image = models.ImageField(verbose_name='Изображение')
     description = models.TextField(verbose_name='Описание', null=True)
     price = models.DecimalField(max_digits=9, decimal_places=2, verbose_name='Цена')
-    characteristics = models.ManyToManyField("specifications.ProductCharacteristics", blank=True, related_name='characteristic_for_product')
+    characteristics = models.ManyToManyField("specifications.ProductCharacteristics", blank=True, related_name='characteristics_for_product')
 
     def __str__(self):
         return self.title
@@ -36,7 +36,7 @@ class Product(models.Model):
         return reverse('product_detail', kwargs={'slug': self.slug})
 
     def get_characteristics(self):
-        return {f.characteristic.characteristic_name: ' '.join([f.value, f.characteristic.unit or ""]) for f in self.characteristic.all()}
+        return {f.characteristic.characteristic_name: ' '.join([f.value, f.characteristic.unit or ""]) for f in self.characteristics.all()}
 
 
 class CartProduct(models.Model):

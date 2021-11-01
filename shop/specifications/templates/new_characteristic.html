@@ -1,7 +1,7 @@
 {% extends 'product_characteristics.html' %}
 {% load crispy_forms_tags %}
 {% block content %}
-<form action="{% url 'new-feature' %}" method="POST">
+<form action="{% url 'new-characteristic' %}" method="POST">
     {% csrf_token %}
     {{ form|crispy }}
     <br>
