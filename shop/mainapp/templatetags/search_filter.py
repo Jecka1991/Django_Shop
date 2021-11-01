@@ -15,7 +15,7 @@ def product_spec(category):
     for product_characteristic in product_characteristics:
         if product_characteristic.value not in characteristic_and_values[(product_characteristic.characteristic.characteristic_name, product_characteristic.characteristic.characteristic_filter_name)]:
             characteristic_and_values[
-                (product_characteristic.characteristic.feature_name, product_characteristic.characteristic.characteristic_filter_name)
+                (product_characteristic.characteristic.characteristic_name, product_characteristic.characteristic.characteristic_filter_name)
             ].append(product_characteristic.value)
     print(characteristic_and_values)
     search_filter_body = """<div class="col-md-12">{}</div>"""

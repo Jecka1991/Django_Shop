@@ -1,4 +1,5 @@
 from django.db import transaction
+from django.db.models import Q
 from django.shortcuts import render
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
@@ -11,6 +12,11 @@ from .forms import OrderForm, LoginForm, RegistrationForm
 from .utils import recalc_cart
 
 from specifications.models import ProductCharacteristics
+
+
+class MyQ(Q):
+
+    default = 'OR'
 
 
 class BaseView(CartMixin, View):
@@ -194,7 +200,8 @@ class LoginView(CartMixin, View):
             if user:
                 login(request, user)
                 return HttpResponseRedirect('/')
-        context = {'form': form, 'cart': self.cart}
+        categories = Category.objects.all()
+        context = {'form': form, 'cart': self.cart, 'categories': categories}
         return render(request, 'login.html', context)
 
 
@@ -222,21 +229,11 @@ class RegistrationView(CartMixin, View):
                 phone=form.cleaned_data['phone'],
                 address=form.cleaned_data['address']
             )
-            user = authenticate(username=form.cleaned_data['username'], password=form.cleaned_data['password'])
+            user = authenticate(
+                username=new_user.username, password=form.cleaned_data['password'])
+
             login(request, user)
             return HttpResponseRedirect('/')
-        context = {'form': form, 'cart': self.cart}
-        return render(request, 'registration.html', context)
-
-
-class ProfileView(CartMixin, View):
-
-    def get(self, request, *args, **kwargs):
-        customer = Customer.objects.get(user=request.user)
-        orders = Order.objects.filter(customer=customer).order_by('-created_at')
         categories = Category.objects.all()
-        return render(
-            request,
-            'profile.html',
-            {'orders': orders, 'cart': self.cart, 'category': categories}
-        )
+        context = {'form': form, 'categories': categories, 'cart': self.cart}
+        return render(request, 'registration.html', context)

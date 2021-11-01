@@ -13,7 +13,7 @@ from mainapp.models import Category, Product
 class BaseSpecView(View):
 
     def get(self, request, *args, **kwargs):
-        return render(request, 'product_characteristic.html', {})
+        return render(request, 'product_characteristics.html', {})
 
 
 class CreateNewCharacteristic(View):
