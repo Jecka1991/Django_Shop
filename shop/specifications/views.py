@@ -302,3 +302,6 @@ class UpdateProductCharacteristicsAjaxView(View):
         return JsonResponse({"result": "ok"})
 
 
+
+
+
